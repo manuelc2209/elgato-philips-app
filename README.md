@@ -1,4 +1,4 @@
-# Getting Started with Create React App
+# [WIP] - Control Philips & Hue on the same network
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
