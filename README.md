@@ -1,46 +1,50 @@
-# [WIP] - Control Philips & Hue on the same spot
+# React Light Control App
+This is a web application being built using React that allows users to control both Philips and Elgato lights from a single user interface.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Features [Work In Progress]
+Autodetect the elgato's / Philips lights IP's on that network.
+Control Philips Hue lights, including turning them on/off, changing brightness, and selecting colors.
+Control Elgato lights, including turning them on/off and changing brightness.
+Intuitive user interface with color selection tool and brightness slider.
+Responsive design, allowing the application to be used on both desktop and mobile devices.
+Connection to both Philips Hue and Elgato lights is made through their respective APIs.
+Getting Started
+To get started with the application, follow these steps:
 
-## Available Scripts
+Clone the repository to your local machine.
+Install dependencies by running npm install or yarn install.
 
-In the project directory, you can run:
+Run the application using npm start or yarn start.
+Navigate to http://localhost:3000 in your web browser to use the application.
+Usage
+Once the application is running, you can use the user interface to control your Philips Hue and Elgato lights.
 
-### `yarn start`
+To control Philips Hue lights:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Click on the Philips Hue tab to view the list of available lights.
+Select a light to control from the list.
+Use the toggle switch to turn the light on/off.
+Use the brightness slider to adjust the brightness of the light.
+Use the color picker to select a color for the light.
+To control Elgato lights:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Click on the Elgato tab to view the list of available lights.
+Select a light to control from the list.
+Use the toggle switch to turn the light on/off.
+Use the brightness slider to adjust the brightness of the light.
+Deployment
+To deploy the application, follow these steps:
 
-### `yarn test`
+Run npm run build or yarn build to create a production build of the application.
+Upload the contents of the build directory to your web server.
+Note that you will need to ensure that your web server is configured to serve static files and that the index.html file is set up to handle routing for your web application.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Contributing
+If you would like to contribute to the application, please follow these steps:
 
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+Fork the repository.
+Create a new branch for your changes.
+Make your changes and test them thoroughly.
+Submit a pull request with your changes.
+License
+This project is licensed under the MIT License. See the LICENSE file for more information.
