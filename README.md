@@ -1,14 +1,15 @@
 # React Light Control App
 This is a web application being built using React that allows users to control both Philips and Elgato lights from a single user interface.
 
-Features [Work In Progress]
+### Features [Work In Progress]
 Autodetect the elgato's / Philips lights IP's on that network.
 Control Philips Hue lights, including turning them on/off, changing brightness, and selecting colors.
 Control Elgato lights, including turning them on/off and changing brightness.
 Intuitive user interface with color selection tool and brightness slider.
 Responsive design, allowing the application to be used on both desktop and mobile devices.
 Connection to both Philips Hue and Elgato lights is made through their respective APIs.
-Getting Started
+
+## Getting Started
 To get started with the application, follow these steps:
 
 Clone the repository to your local machine.
@@ -19,6 +20,7 @@ Navigate to http://localhost:3000 in your web browser to use the application.
 Usage
 Once the application is running, you can use the user interface to control your Philips Hue and Elgato lights.
 
+### Future Phase:
 To control Philips Hue lights:
 
 Click on the Philips Hue tab to view the list of available lights.
@@ -39,7 +41,7 @@ Run npm run build or yarn build to create a production build of the application.
 Upload the contents of the build directory to your web server.
 Note that you will need to ensure that your web server is configured to serve static files and that the index.html file is set up to handle routing for your web application.
 
-Contributing
+## Contributing
 If you would like to contribute to the application, please follow these steps:
 
 Fork the repository.
