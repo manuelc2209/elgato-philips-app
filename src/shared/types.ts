@@ -9,3 +9,15 @@ export interface KeylightResp {
         settingsCall: any;
     };
 }
+
+export type LightTypes = {
+    elgato?: KeylightResp[];
+    philips?: KeylightResp[];
+};
+
+export type ToggleKeylightResult = {
+    keyLightOn: boolean;
+    handleElgatoLightToggle: () => void;
+    handlePhilipsLightToggle: () => void;
+    availableLights?: LightTypes;
+};

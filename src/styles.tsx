@@ -40,3 +40,9 @@ export const StyledColumn = styled.div`
     gap: 16px;
     align-items: center;
 `;
+
+export const StyledLightsContainer = styled.div`
+    display: flex;
+    gap: 16px;
+    box-sizing: border-box;
+`;
