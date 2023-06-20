@@ -6,6 +6,9 @@ const port = 3001;
 const mdns = require("mdns-js");
 const axios = require("axios");
 const bodyParser = require("body-parser");
+const os = require("os");
+
+const networkInterfaces = os.networkInterfaces();
 
 // Allow all CORS requests
 app.use(cors());

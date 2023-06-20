@@ -1,38 +1,38 @@
 import { useState, useEffect, SetStateAction, Dispatch } from "react";
 import axios from "axios";
-import { KeylightResp } from "../shared/types";
-
-type ToggleKeylightResult = [boolean, () => void, boolean, string | undefined];
+import {
+    KeylightResp,
+    LightTypes,
+    ToggleKeylightResult,
+} from "../shared/types";
 
 const useToggleKeylight = (
     setLightsAddresses: Dispatch<SetStateAction<KeylightResp[]>>,
     lightsAddresses?: KeylightResp[]
 ): ToggleKeylightResult => {
-    const [keylightOn, setKeylightOn] = useState(false);
-    const [targetUrl, setTargetUrl] = useState<string>();
+    const [keylightOn, setKeylightOn] = useState<boolean>(false);
+    const [availableLights, setAvailableLights] = useState<
+        LightTypes | undefined
+    >();
 
-    const handleToggleKeylight = () => {
-        if (!lightsAddresses || !lightsAddresses.length) {
+    const handleElgatoLightToggle = () => {
+        if (!lightsAddresses || lightsAddresses.length === 0) {
             return;
         }
 
-        const keylightAddress = lightsAddresses[0].networkAddress;
-        const lights = lightsAddresses?.[0].keyLight.optionsCall.lights;
-        const on = lights[0].on ? 0 : 1;
+        const elgatoLights = lightsAddresses.filter((light) => light.isElgato);
+
+        const { networkAddress, keyLight } = elgatoLights[0];
+        const { lights } = keyLight.optionsCall;
+        setKeylightOn(lights[0].on === 0);
+        const on = keylightOn ? 0 : 1;
 
         axios
             .put(
-                "http://localhost:3001/elgato/lights",
+                `http://localhost:3001/elgato/lights`,
                 {
-                    lights: [
-                        {
-                            on: lightsAddresses[0].keyLight.optionsCall
-                                .lights[0].on
-                                ? 0
-                                : 1,
-                        },
-                    ],
-                    targetUrl: keylightAddress,
+                    lights: [{ on: on }],
+                    targetUrl: networkAddress,
                 },
                 {
                     headers: {
@@ -40,31 +40,37 @@ const useToggleKeylight = (
                     },
                 }
             )
-            .then(() => {
-                // Update the state of the lights to reflect the new on state
+            .then((lightsAddresses) => {
                 if (lightsAddresses) {
-                    setLightsAddresses((lightsAddresses) => {
-                        const updatedLightsAddresses = [...lightsAddresses];
-                        updatedLightsAddresses[0].keyLight.optionsCall.lights[0].on =
-                            on;
-                        return updatedLightsAddresses;
-                    });
-                    setKeylightOn(Boolean(on));
+                    setKeylightOn(!keylightOn);
                 }
             })
             .catch(() => {});
     };
 
     useEffect(() => {
-        if (lightsAddresses && lightsAddresses.length) {
-            setTargetUrl(lightsAddresses[0].networkAddress);
-            setKeylightOn(
-                Boolean(lightsAddresses[0].keyLight.optionsCall.lights[0].on)
+        if (lightsAddresses && lightsAddresses.length > 0) {
+            const elgatoLights = lightsAddresses.filter(
+                (light) => light.isElgato
             );
+            const philipsLights = lightsAddresses.filter(
+                (light) => light.isPhilips
+            );
+            const lights = {
+                elgato: elgatoLights,
+                philips: philipsLights,
+            };
+
+            setAvailableLights({ ...lights });
         }
     }, [lightsAddresses]);
 
-    return [keylightOn, handleToggleKeylight, Boolean(targetUrl), targetUrl];
+    return {
+        keyLightOn: keylightOn,
+        handleElgatoLightToggle,
+        handlePhilipsLightToggle: () => undefined,
+        availableLights,
+    };
 };
 
 export default useToggleKeylight;

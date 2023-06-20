@@ -1,14 +1,17 @@
+import { Elgato, Philips } from "./components";
 import { useHueToggle } from "./hooks/useHueToggle";
 import useToggleKeylight from "./hooks/useKeylightToggle";
 import { useLightsAddresses } from "./hooks/useLightsAddresses";
-import { StyledApp, StyledColumn } from "./styles";
+import { StyledApp, StyledColumn, StyledLightsContainer } from "./styles";
 
 export const App = () => {
     const { lightsAddresses, setLightsAddresses } = useLightsAddresses();
-    const [keylightOn, toggleKeylight] = useToggleKeylight(
-        setLightsAddresses,
-        lightsAddresses
-    );
+    const {
+        keyLightOn,
+        handleElgatoLightToggle,
+        handlePhilipsLightToggle,
+        availableLights,
+    } = useToggleKeylight(setLightsAddresses, lightsAddresses);
     const [hueOn, toggleHue] = useHueToggle("", "", "");
 
     return (
@@ -17,26 +20,22 @@ export const App = () => {
                 {lightsAddresses && (
                     <div>{`Found ${lightsAddresses?.length} network device`}</div>
                 )}
-                <div>
-                    <button
-                        onClick={toggleKeylight}
-                        disabled={!lightsAddresses?.length}
-                    >
-                        {keylightOn ? "Turn off Keylights" : "Turn on Keylight"}{" "}
-                    </button>
-                    <button
-                        onClick={toggleHue}
-                        disabled={!lightsAddresses?.length}
-                    >
-                        {hueOn ? "Turn on Hue lights" : "Turn off Hue light"}
-                    </button>
-                </div>
+
                 {lightsAddresses && (
-                    <div>
-                        {lightsAddresses?.map((entry) => (
-                            <div>{entry.networkAddress}</div>
-                        ))}
-                    </div>
+                    <StyledLightsContainer>
+                        <Elgato
+                            availableLights={availableLights}
+                            handleElgatoLightToggle={handleElgatoLightToggle}
+                            lightsAddresses={lightsAddresses}
+                            keyLightOn={keyLightOn}
+                        />
+                        <Philips
+                            availableLights={availableLights}
+                            handlePhilipsLightToggle={handlePhilipsLightToggle}
+                            lightsAddresses={lightsAddresses}
+                            keyLightOn={keyLightOn}
+                        />
+                    </StyledLightsContainer>
                 )}
             </StyledColumn>
         </StyledApp>
