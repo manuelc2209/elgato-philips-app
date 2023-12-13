@@ -1,29 +1,76 @@
-import React from "react";
+import React, { useState } from "react";
 import { ElgatoProps } from "./types";
 import { nanoid } from "nanoid";
 import { StyledBody, StyledElgato } from "./styles";
+import axios from "axios";
+import { KeylightResp } from "../../shared/types";
 
 export const Elgato: React.FC<ElgatoProps> = ({
-    availableLights,
-    handleElgatoLightToggle,
     lightsAddresses,
-    keyLightOn,
+    setLights,
 }) => {
-    if (!availableLights?.elgato) {
+    const [keylightOn, setKeylightOn] = useState<boolean>(false);
+    if (!lightsAddresses) {
         return <></>;
     }
+
+    const filterForElgatoLights = lightsAddresses.filter(
+        (light) => light.isElgato
+    );
+
+    const handleElgatoLightToggle = (entry: KeylightResp) => {
+        const { networkAddress, keyLight } = entry;
+        const { lights } = keyLight.optionsCall;
+        setKeylightOn(lights[0].on === 0);
+        const on = keylightOn ? 0 : 1;
+
+        axios
+            .put(
+                `http://localhost:3001/elgato/lights`,
+                {
+                    lights: [{ on: on }],
+                    targetUrl: networkAddress,
+                },
+                {
+                    headers: {
+                        Accept: "application/json",
+                    },
+                }
+            )
+            .then(() => {
+                setLights((prevAddresses) => [
+                    ...prevAddresses.map((light) =>
+                        light.networkAddress === entry.networkAddress
+                            ? {
+                                  ...light,
+                                  keyLight: {
+                                      ...light.keyLight,
+                                      optionsCall: {
+                                          ...light.keyLight.optionsCall,
+                                          lights: [{ on }],
+                                      },
+                                  },
+                              }
+                            : light
+                    ),
+                ]);
+            })
+            .catch(() => {});
+    };
 
     return (
         <StyledElgato>
             <span>Elgato Lights</span>
-            {availableLights.elgato.map((entry) => (
+            {filterForElgatoLights.map((entry) => (
                 <StyledBody key={nanoid()}>
                     <span>{entry.networkAddress}</span>
                     <button
-                        onClick={handleElgatoLightToggle}
-                        disabled={!lightsAddresses?.length}
+                        onClick={() => handleElgatoLightToggle(entry)}
+                        disabled={!filterForElgatoLights?.length}
                     >
-                        {keyLightOn ? "Turn off Keylights" : "Turn on Keylight"}
+                        {entry.keyLight.optionsCall.lights[0].on === 1
+                            ? "Turn off Keylights"
+                            : "Turn on Keylight"}
                     </button>
                 </StyledBody>
             ))}

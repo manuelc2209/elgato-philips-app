@@ -4,26 +4,28 @@ import { nanoid } from "nanoid";
 import { StyledBody, StyledPhilips } from "./styles";
 
 export const Philips: React.FC<PhilipsProps> = ({
-    availableLights,
-    handlePhilipsLightToggle,
     lightsAddresses,
-    keyLightOn,
+    setLights,
 }) => {
-    if (!availableLights?.philips) {
+    if (!lightsAddresses) {
         return <></>;
     }
+
+    const filterForPhilipsLights = lightsAddresses.filter(
+        (light) => light.isPhilips
+    );
 
     return (
         <StyledPhilips>
             <span>Philips Lights</span>
-            {availableLights?.philips?.map((entry) => (
+            {filterForPhilipsLights?.map((entry) => (
                 <StyledBody key={nanoid()}>
                     <span>{entry.networkAddress}</span>
                     <button
-                        onClick={handlePhilipsLightToggle}
-                        disabled={!lightsAddresses?.length}
+                        onClick={() => console.log("click")}
+                        disabled={!filterForPhilipsLights?.length}
                     >
-                        {keyLightOn ? "Turn off Hue" : "Turn on Hue"}
+                        {1 ? "Turn off Hue" : "Turn on Hue"}
                     </button>
                 </StyledBody>
             ))}

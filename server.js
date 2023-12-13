@@ -1,99 +1,97 @@
 const express = require("express");
-const app = express();
+const http = require("http");
+const WebSocket = require("ws");
 const cors = require("cors");
-const port = 3001;
-
 const mdns = require("mdns-js");
 const axios = require("axios");
 const bodyParser = require("body-parser");
-const os = require("os");
 
-const networkInterfaces = os.networkInterfaces();
+const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
-// Allow all CORS requests
+const port = 3001;
+let initialUniqueDeviceId = [];
+
 app.use(cors());
 app.use(bodyParser.json());
 
-async function startDiscovery(ip) {
-    return new Promise((resolve, reject) => {
-        const browser = mdns.createBrowser(mdns.tcp("http"));
+async function getElgatoInfo(addresses, port) {
+    try {
+        const settingsCall = await axios
+            .get(`http://${addresses}:${port}/elgato/lights/settings`)
+            .then((res) => res.data);
 
-        browser.on("ready", () => {
-            console.log(`MDNS browser ready for ${ip}`);
-        });
+        const infoCall = await axios
+            .get(`http://${addresses}:${port}/elgato/accessory-info`)
+            .then((res) => res.data);
 
-        let foundDevices = [];
+        const optionsCall = await axios
+            .get(`http://${addresses}:${port}/elgato/lights`)
+            .then((res) => res.data);
 
-        browser.on("update", async (service) => {
-            const { addresses, fullname, port } = service;
+        return {
+            settingsCall,
+            infoCall,
+            optionsCall,
+        };
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
 
-            const isElgato = fullname.includes("Elgato");
-            const isPhilips = fullname.includes("Philips");
+function startDiscovery(ws, ip) {
+    const browser = mdns.createBrowser(mdns.tcp("http"));
 
-            if (isElgato || isPhilips) {
-                let keyLight;
-
-                if (isElgato) {
-                    try {
-                        // Grab our keylight's settings, info, and current options
-                        let settingsCall = await axios
-                            .get(
-                                `http://${addresses}:${port}/elgato/lights/settings`
-                            )
-                            .then((res) => res.data);
-
-                        let infoCall = await axios
-                            .get(
-                                `http://${addresses}:${port}/elgato/accessory-info`
-                            )
-                            .then((res) => res.data);
-
-                        let optionsCall = await axios
-                            .get(`http://${addresses}:${port}/elgato/lights`)
-                            .then((res) => res.data);
-
-                        keyLight = {
-                            settingsCall,
-                            infoCall,
-                            optionsCall,
-                        };
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }
-
-                foundDevices.push({
-                    isElgato,
-                    isPhilips,
-                    ip: addresses,
-                    networkAddress: `${addresses}:${port}`,
-                    keyLight,
-                });
-            }
-        });
-
-        browser.on("error", (err) => {
-            console.error(err);
-            reject(err);
-        });
-
-        browser.discover();
-
-        setTimeout(() => {
-            browser.stop();
-            resolve(foundDevices);
-        }, 5000);
+    browser.on("ready", () => {
+        console.log(`MDNS browser ready for ${ip}`);
     });
+
+    browser.on("update", async (service) => {
+        const { addresses, fullname, port } = service;
+
+        const isElgato = fullname.includes("Elgato");
+        const isPhilips = fullname.includes("Hue Bridge");
+
+        if (isElgato || isPhilips) {
+            let keyLight;
+
+            if (isElgato) {
+                keyLight = await getElgatoInfo(addresses, port);
+            }
+
+            const device = {
+                isElgato,
+                isPhilips,
+                ip: addresses,
+                networkAddress: `${addresses}:${port}`,
+                keyLight,
+            };
+
+            if (!initialUniqueDeviceId.includes(device.networkAddress)) {
+                initialUniqueDeviceId.push(device.networkAddress);
+                ws.send(JSON.stringify(device));
+            }
+        }
+    });
+
+    browser.on("error", (err) => {
+        console.error(err);
+    });
+
+    browser.discover();
 }
 
-async function discoverDevices() {
-    const results = await startDiscovery(`192.168.1.0`);
-    return [...new Set(results)];
-}
+wss.on("connection", (ws) => {
+    console.log("WebSocket client connected");
 
-app.get("/devices", async (req, res) => {
-    const devices = await discoverDevices();
-    res.json(devices);
+    ws.on("close", () => {
+        console.log("WebSocket client disconnected");
+        initialUniqueDeviceId = [];
+    });
+
+    startDiscovery(ws, "192.168.1.0");
 });
 
 app.put("/elgato/lights", (req, res) => {
@@ -115,7 +113,7 @@ app.put("/elgato/lights", (req, res) => {
         });
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
 });
 
