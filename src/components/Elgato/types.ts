@@ -1,8 +1,6 @@
-import { KeylightResp, LightTypes } from "../../shared/types";
+import { KeylightResp } from "../../shared/types";
 
 export interface ElgatoProps {
-    availableLights?: LightTypes;
-    handleElgatoLightToggle: () => void;
     lightsAddresses: KeylightResp[];
-    keyLightOn: boolean;
+    setLights: (value: React.SetStateAction<KeylightResp[]>) => void;
 }
