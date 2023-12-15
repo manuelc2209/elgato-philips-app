@@ -26,7 +26,7 @@ export const Elgato: React.FC<ElgatoProps> = ({
 
         axios
             .put(
-                `http://localhost:3001/elgato/lights`,
+                `http://${window.location.hostname}:3001/elgato/lights`,
                 {
                     lights: [{ on: on }],
                     targetUrl: networkAddress,
@@ -38,6 +38,7 @@ export const Elgato: React.FC<ElgatoProps> = ({
                 }
             )
             .then(() => {
+                console.log("networkAddress", networkAddress);
                 setLights((prevAddresses) => [
                     ...prevAddresses.map((light) =>
                         light.networkAddress === entry.networkAddress

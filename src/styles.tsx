@@ -46,3 +46,5 @@ export const StyledLightsContainer = styled.div`
     gap: 16px;
     box-sizing: border-box;
 `;
+
+export const StyledLightsLabel = styled.div``;

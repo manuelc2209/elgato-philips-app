@@ -51,6 +51,8 @@ function startDiscovery(ws, ip) {
     browser.on("update", async (service) => {
         const { addresses, fullname, port } = service;
 
+        if (!fullname) return;
+
         const isElgato = fullname.includes("Elgato");
         const isPhilips = fullname.includes("Hue Bridge");
 

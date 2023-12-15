@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
-import { StyledApp, StyledColumn, StyledLightsContainer } from "./styles";
+import {
+    StyledApp,
+    StyledColumn,
+    StyledLightsContainer,
+    StyledLightsLabel,
+} from "./styles";
 import { KeylightResp } from "./shared/types";
 import { Elgato, Philips } from "./components";
+import { nanoid } from "nanoid";
 
 export const App = () => {
     const [lights, setLights] = useState<KeylightResp[]>([]);
-    const socket = new WebSocket("ws://localhost:3001");
+    const socket = new WebSocket(`ws://${window.location.hostname}:3001`);
 
     socket.onmessage = (event) => {
         const device = JSON.parse(event.data);
@@ -29,7 +35,7 @@ export const App = () => {
     return (
         <StyledApp>
             <StyledColumn>
-                <div>{`Found ${lights?.length} network device`}</div>
+                <StyledLightsLabel>{`Found ${lights?.length} network device`}</StyledLightsLabel>
 
                 {lights && (
                     <StyledLightsContainer>
@@ -38,11 +44,13 @@ export const App = () => {
                                 <Elgato
                                     lightsAddresses={lights}
                                     setLights={setLights}
+                                    key={nanoid()}
                                 />
                             ) : (
                                 <Philips
                                     lightsAddresses={lights}
                                     setLights={setLights}
+                                    key={nanoid()}
                                 />
                             )
                         )}
